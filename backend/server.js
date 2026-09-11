@@ -15,6 +15,8 @@ app.get('/', (req, res) => {
     res.json({message: "Backend running"});
 })
 
+
+// register user
 app.post('/api/auth/register', async(req, res) => {
     try{
     const {name, email, password, role, rollno} = req.body;
@@ -68,6 +70,51 @@ app.post('/api/auth/register', async(req, res) => {
             success:false,
             message: 'Internal server error'
         });
+    }
+});
+
+//user login
+app.post('/api/auth/login', async (req,res) => {
+    try {
+        const {email, password} = req.body;
+
+        if(!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide both email and password.'
+            });
+        }
+
+        const{data, error} = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if(error) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Login Success!',
+            token: data.session.access_token,
+            user: {
+                id: data.user.id,
+                email: data.user.email,
+                name: data.user.user_metadata?.name,
+                role: data.user.user_metadata?.role,
+                rollno: data.user.user_metadata?.rollno
+            }
+        });
+    } catch(err) {
+        console.error('Login error', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+    });
     }
 });
 
