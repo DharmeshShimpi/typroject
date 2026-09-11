@@ -25,14 +25,50 @@ try {
     if(response.ok && result.success) {
         localStorage.setItem('token', result.token);
         localStorage.setItem('user', JSON.stringify(result.user));
-        alert("login success")
-        window.location.href = 'index.html';
+        
+        //toast notification from toastify
+        Toastify({
+            text: "login success",
+            duration: 2000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "#41ba00ff",
+                borderRadius: "10px"
+            }
+        }).showToast();
+
+
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 2000);
+        
     } else {
-        alert('Login failed!')
+        Toastify({
+            text: "login failed: " + result.message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "#ff2134ff",
+                borderRadius: "10px"
+            }
+        }).showToast();
     }
 } catch (err) {
     console.error('login error:', err);
-    alert('could not connect to backend');
+    
+    Toastify({
+        text: "could not connect to backend",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: {
+            background: "#ff2134ff",
+            borderRadius: "10px"
+        }
+    }).showToast();
+    
 } finally {
     submitBtn.innerText = 'Login';
     submitBtn.disabled = false;
