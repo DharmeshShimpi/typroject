@@ -40,7 +40,7 @@ try {
 
 
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'teacher-dashboard.html';
         }, 2000);
         
     } else {
