@@ -27,9 +27,9 @@ try {
         localStorage.setItem('user', JSON.stringify(result.user));
         
         //toast notification from toastify
-        Toastify({
+        Toastify({ // so this all is a object. like key value pairs. very simple
             text: "login success",
-            duration: 2000,
+            duration: 2000, // means 2000ms ~ 2 seconds
             gravity: "top",
             position: "right",
             style: {
