@@ -42,7 +42,7 @@
             <p class="text-muted">
                 Create a New Organization. Setup member limits, and more...
             </p>
-            <button class="btn btn-primary" id="createOrg" 
+            <button class="btn btn-primary"
             data-bs-toggle="modal" data-bs-target="#createOrgModal"> <!-- bootstrap code to create a modal window -->
                 <i class="bi bi-plus-circle me-2"></i>
                 Create Organization
@@ -75,7 +75,7 @@
     </main>
 
 
-    <!-- create organization modal -->
+    <!-- create_organization modal -->
      <div class="modal fade" id="createOrgModal">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-3 shadow">
@@ -85,69 +85,72 @@
                     <h1 class="modal-title fs-5 fw-bold">
                         Create Organization
                     </h1>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal">   
-                    </button>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <!-- modal header end -->
 
                 <!-- modal body -->
-                 <form id="createOrgForm">
+                <form id="createOrgForm">
                     <div class="modal-body py-3">
-
-                        <!-- org name -->
                         <div class="mb-3">
-                            <label for="orgName" class="form-label">
-                                Organization Name
+                            <label class="form-label fw-semibold">
+                            Organization Name
                             </label>
                             <input type="text" class="form-control" id="orgName" placeholder="e.g. Final Year Project 2026" required>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Description
+                            </label>
+                            <textarea class="form-control" id="orgDesc" rows="2" placeholder="Brief details about this project batch..." required></textarea>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">
+                                    Academic Year
+                                </label>
+                                <select class="form-select" id="orgYear" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="SY">Second Year (SY)</option>
+                                    <option value="TY">Third Year (TY)</option>
+                                </select>
+                            </div>
 
-                    <!-- org desc -->
-                    <div class="mb-3">
-                        <label for="orgDesc" class="form-label">Description</label>
-                        <textarea class="form-control" id="orgDesc" rows="2" placeholder="Brief details about this project batch..."></textarea>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">
+                                    Department
+                                </label>
+                                <select class="form-select" id="orgDept" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="BCS">BCS</option>
+                                    <option value="BCA">BCA</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">
+                                    Min Members
+                                </label>
+                                <input type="number" class="form-control" id="minMembers" min="1" max="10" value="2" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">
+                                    Max Members
+                                </label>
+                                <input type="number" class="form-control" id="maxMembers" min="1" max="10" value="4" required>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- academic year -->
-                     <div class="row g-2 mb-3">
-            <div class="col-6">
-              <label for="orgYear" class="form-label fw-semibold">Academic Year</label>
-              <select class="form-select" id="orgYear" required>
-                <option value="">-- Select --</option>
-                <option value="SY">Second Year (SY)</option>
-                <option value="TY">Third Year (TY)</option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label for="orgDept" class="form-label fw-semibold">Department</label>
-              <select class="form-select" id="orgDept" required>
-                <option value="">-- Select --</option>
-                <option value="BCS">BCS</option>
-                <option value="BCA">BCA</option>
-                <option value="B.Sc CS">B.Sc CS</option>
-                <option value="B.Tech">B.Tech</option>
-              </select>
-            </div>
-          </div>
-          <!-- Member Limits (Side-by-side) -->
-          <div class="row g-2">
-            <div class="col-6">
-              <label for="minMembers" class="form-label fw-semibold">Min Members</label>
-              <input type="number" class="form-control" id="minMembers" min="1" max="10" value="2" required>
-            </div>
-            <div class="col-6">
-              <label for="maxMembers" class="form-label fw-semibold">Max Members</label>
-              <input type="number" class="form-control" id="maxMembers" min="1" max="10" value="4" required>
-            </div>
-          </div>
-        </div>
-        <!-- 3. Modal Footer -->
-        <div class="modal-footer border-top-0 pt-0">
-          <button type="button" class="btn btn-light text-muted" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary px-4">Create</button>
-        </div>
-
-                 </form>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button class="btn btn-light text-muted" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Create
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
      </div>
