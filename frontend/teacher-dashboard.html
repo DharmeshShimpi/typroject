@@ -58,18 +58,23 @@
         </div>
 
         <!-- empty state -->
-        <div class="px-3">
-            <div class="p-3 card bg-light text-muted d-flex justify-content-center align-items-center">
-            <h5>
-                No organizations created!
-            </h5>
-            <p class="text-muted">
-                You haven't created any organisations yet. Create one to invite students.
-            </p>
-            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createOrgModal">
-                <i class="bi bi-plus-circle me-2"></i>Create Your First Organization
-            </button>
+        <div class="px-3" id="emptyState">
+            <div class="p-3 card bg-light text-muted d-flex justify-content-center      align-items-center">
+                <h5>
+                    No organizations created!
+                </h5>
+                <p class="text-muted">
+                    You haven't created any organisations yet. Create one to invite students.
+                </p>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"           data-bs-target="#createOrgModal">
+                    <i class="bi bi-plus-circle me-2"></i>Create Your First Organization
+                </button>
             </div>
+        </div>
+
+        <!-- MOST IMP PART, because cards will render here dynamically -- look for teacher-dashboard.js -->
+        <div id="orgContainer" class="row g-3 px-3">
+            <!-- when the teacher will create a new organization, they will be rendered here -->
         </div>
 
     </main>
@@ -159,5 +164,7 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- bootstrap JS link  -->
+
+    <script src="./js/teacher-dashboard.js"></script>
 </body>
 </html>
