@@ -47,19 +47,19 @@ async function loadOrganizations() {
 
 function renderOrganizations(orgs) {
     if(!orgs || orgs.length === 0) {
-        emptyState.classList.remove('d-none')
+        emptyState.classList.remove('d-none') // display none. // now this does not removes the empty state
 
         orgContainer.innerHTML = '';
 
         return;
     }
 
-    emptyState.classList.add('d-none');
+    emptyState.classList.add('d-none'); // added d-none
 
     orgContainer.innerHTML = orgs.map((org) => {
         return `
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-0 rounded-3">
+            <div class="card h-100 shadow border-0 rounded-3">
                 <div class="card-body d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>

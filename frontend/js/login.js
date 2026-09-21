@@ -41,7 +41,7 @@ loginForm.addEventListener('submit', async (preventRelode) => {
 
             setTimeout(() => {
                 if (result.user.role === "teacher") {
-                    window.location.href = "teacher-dashboard.html";
+                    window.location.href = "./teacher/teacher-dashboard.html";
                 } else if (result.user.role === "student") {
                     window.location.href = "./student/student-dashboard.html";
                 }
