@@ -1,0 +1,20 @@
+body {
+    background-color: #f8f9fa;
+}
+.navbar {
+    background-color: white;
+}
+.card {
+    background-color: white;
+}
+.info-box {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+}
+#orgCode {
+    letter-spacing: 4px;
+}
+#organizationSection .card {
+    border-radius: 15px;
+}
