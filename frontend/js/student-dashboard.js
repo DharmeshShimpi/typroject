@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     duration: 2500,
                     gravity: "right",
                     style: {
-                        background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                        background: "#ff2134ff",
                         borderRadius: "10px",
                     }
 
@@ -48,20 +48,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             Toastify({
                 text: `Joining organization..${orgCode}.`,
-                duration: 2500,
+                duration: 3000,
                 gravity: "right",
                 style: {
-                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    background: "#41ba00ff",
+                    borderRadius: "10px"
                 }
             }).showToast();
-            if (joinOrgSection) {
-                joinOrgSection.classList.add('d-none');
-            }
             if (orgSection) {
                 orgSection.classList.remove('d-none');
                 orgSection.innerHTML = `<div class="card shadow-sm border rounded-3 p-4">
                 <h4>Successfully joined organization with code: ${orgCode}</h4>
-                </div>`;
+                </div>`; // need to add cards here.
             }
         });
     }
