@@ -1,9 +1,9 @@
+
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     const user = savedUser ? JSON.parse(savedUser) : null;
     if (!token || !user) {
-
         window.location.href = '/login.html';
         return;
     }
@@ -13,7 +13,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     const joinOrgForm = document.getElementById('joinOrgForm');
     const orgCodeInput = document.getElementById('orgCode');
     const orgSection = document.getElementById('organizationSection');
-    const JoinOrgSection = document.getElementById('joinOrgSection');
+    const joinOrgSection = document.getElementById('joinOrgSection');
+    const loadOrganizations = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/students/my-organizations', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Failed to fetch organizations');
+            }
+            if (result.organizations.length === 0) {
+                return;
+
+            }
+            joinOrgSection.classList.add('d-none');
+            orgSection.classList.remove('d-none');
+            orgSection.innerHTML = result.organizations.map((organization) => `
+<div class="card shadow-sm border rounded-3 p-4 mb-3">
+<h4>${organization.name}</h4>
+<p> Department :${organization.department}</p>
+<p> Academic Year:${organization.academic_year}</p>
+<p> Code:${organization.join_code}</p></div>
+`).join('');
+        }
+        catch (error) {
+            console.error('load organization error:', error);
+        }
+    };
+    await loadOrganizations();
     if (studentNameDisplay) {
         const name = user.name || "student";
         studentNameDisplay.innerHTML = `<i class="bi bi-person-circle me-1"></i> ${name}`;
@@ -42,10 +72,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         background: "#ff2134ff",
                         borderRadius: "10px",
                     }
-
                 }).showToast();
                 return;
-
             }
             try {
                 const response = await fetch(
@@ -59,8 +87,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         body: JSON.stringify({ orgCode })
                     }
                 );
-
-
                 const result = await response.json();
                 if (!response.ok || !result.success) {
                     throw new Error(result.message || 'Failed to join organization');
@@ -74,13 +100,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         background: "linear-gradient(to right, #00b09b, #96c93d)",
                     }
                 }).showToast();
-                JoinOrgSection.classList.add('d-none');
+                joinOrgSection.classList.add('d-none');
                 orgSection.classList.remove('d-none');
                 orgSection.innerHTML = `<div class="card shadow-sm border rounded-3 p-4">
                     <h4> Successfully joined organization</h4>
                     <p> Name :${result.organization.name}</p>
                     <p> Code: ${result.organization.join_code}</p></div>`;
-
             }
             catch (error) {
                 console.log('join organization error:', error);
@@ -95,7 +120,5 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }).showToast();
             }
         })
-
     };
-
 });
