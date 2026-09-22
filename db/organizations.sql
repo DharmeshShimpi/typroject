@@ -10,3 +10,11 @@ create table if not exists organizations (
     join_code text not null unique,
     created_at timestamp with time zone default now()
 );
+
+create table if not exists organization_members (
+    id uuid default gen_random_uuid() primary key,
+    organization_id uuid references organizations(id) on delete cascade not null,
+    student_id uuid references auth.users(id) on delete cascade not null,
+    joined_at timestamp with time zone default now(),
+    unique (organization_id, student_id)
+);

@@ -5,22 +5,25 @@ export const joinOrganization = async (req, res) => {
     try{
         const studentId = req.user.id;
         const { orgCode } = req.body;
+        const normalizedOrgCode = String(orgCode).trim();
         if(!orgCode) {
             return res.status(400).json({
                 success: false,
                 message: "Organization code is required"
             });
     }
-    if(req.user.user_metadata.role!='student'){
+    
+    if(req.user.user_metadata?.role!=='student'){
         return res.status(403).json({
             success: false,
             message: "Only students can join organizations"
         });
     }
+    
     const { data: organization, error: orgError } = await supabase
         .from('organizations')
         .select('*')
-        .eq('join_code', orgCode.trim())
+        .eq('join_code', normalizedOrgCode)
         .maybeSingle();
     if(orgError) {
         return res.status(400).json({

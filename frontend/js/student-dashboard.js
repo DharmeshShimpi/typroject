@@ -45,22 +45,57 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 }).showToast();
                 return;
+
             }
-            Toastify({
-                text: `Joining organization..${orgCode}.`,
-                duration: 3000,
-                gravity: "right",
-                style: {
-                    background: "#41ba00ff",
-                    borderRadius: "10px"
+            try {
+                const response = await fetch(
+                    'http://localhost:5000/api/students/join-organization',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ orgCode })
+                    }
+                );
+
+
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to join organization');
                 }
-            }).showToast();
-            if (orgSection) {
+                Toastify({
+                    text: result.message,
+                    duration: 2500,
+                    gravity: "right",
+                    position: "top",
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }
+                }).showToast();
+                JoinOrgSection.classList.add('d-none');
                 orgSection.classList.remove('d-none');
                 orgSection.innerHTML = `<div class="card shadow-sm border rounded-3 p-4">
-                <h4>Successfully joined organization with code: ${orgCode}</h4>
-                </div>`; // need to add cards here.
+                    <h4> Successfully joined organization</h4>
+                    <p> Name :${result.organization.name}</p>
+                    <p> Code: ${result.organization.join_code}</p></div>`;
+
             }
-        });
-    }
+            catch (error) {
+                console.log('join organization error:', error);
+                Toastify({
+                    text: error.message || "Failed to join organization",
+                    duration: 2500,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    }
+                }).showToast();
+            }
+        })
+
+    };
+
 });
