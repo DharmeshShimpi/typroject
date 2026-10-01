@@ -34,6 +34,16 @@ const joinBtn = document.getElementById('joinBtn');
 
 
 async function loadOrganizations() {
+    if (emptyState) emptyState.classList.add('d-none');
+    if (orgContainer) {
+        orgContainer.innerHTML = `
+            <div class="col-12 text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                Loading organizations...
+            </div>
+        `;
+    }
+
     try {
         const response = await fetch('http://localhost:5000/api/students/my-organizations', {
             method: 'GET',
@@ -48,10 +58,14 @@ async function loadOrganizations() {
             renderOrganizations(result.organizations);
         } else {
             console.error('Failed to load organizations:', result.message);
+            if (orgContainer) orgContainer.innerHTML = '';
+            if (emptyState) emptyState.classList.remove('d-none');
         }
 
     } catch (err) {
         console.error('Network error loading organizations:', err);
+        if (orgContainer) orgContainer.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('d-none');
     }
 }
 

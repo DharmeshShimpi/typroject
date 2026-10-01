@@ -23,6 +23,16 @@ const orgContainer = document.getElementById('orgContainer');
 
 // now we will fetch the data from backend
 async function loadOrganizations() {
+    if (emptyState) emptyState.classList.add('d-none');
+    if (orgContainer) {
+        orgContainer.innerHTML = `
+            <div class="col-12 text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                Loading organizations...
+            </div>
+        `;
+    }
+
     try {
         const response = await fetch("http://localhost:5000/api/organizations", {
             method: 'GET',
@@ -31,30 +41,32 @@ async function loadOrganizations() {
             }
         });
 
-    // storing response in result
-    const result = await response.json();
+        // storing response in result
+        const result = await response.json();
 
-    if(response.ok && result.success) {
-        renderOrganizations(result.organizations);// renderOrganizations function is called with organizations which we're getting from backend.
-    } else {
-        console.error("Failed to load organizations:", result.message);
-    } 
+        if(response.ok && result.success) {
+            renderOrganizations(result.organizations); // renderOrganizations function is called with organizations which we're getting from backend.
+        } else {
+            console.error("Failed to load organizations:", result.message);
+            if (orgContainer) orgContainer.innerHTML = ''; // removes the loading spinner in case of any error
+            if (emptyState) emptyState.classList.remove('d-none');
+        } 
 
     } catch(err) { // in case network is not working, catch will throw error
         console.error("Could not load organizations:", err);
+        if (orgContainer) orgContainer.innerHTML = ''; // removes the loading spinner in case of any error
+        if (emptyState) emptyState.classList.remove('d-none');
     }
 }
 
 function renderOrganizations(orgs) {
-    if(!orgs || orgs.length === 0) {
-        emptyState.classList.remove('d-none') // display none. // now this does not removes the empty state
-
-        orgContainer.innerHTML = '';
-
+    if (!orgs || orgs.length === 0) {
+        if (emptyState) emptyState.classList.remove('d-none');
+        if (orgContainer) orgContainer.innerHTML = '';
         return;
     }
 
-    emptyState.classList.add('d-none'); // added d-none
+    if (emptyState) emptyState.classList.add('d-none');
 
     orgContainer.innerHTML = orgs.map((org) => {
         return `
