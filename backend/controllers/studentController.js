@@ -123,11 +123,14 @@ export const getMyOrganizations = async (req, res) => {
 export const createGroup = async (req, res) => {
     try {
         const student_id = req.user.id;
-        const { organization_id, name, max_members } = req.body;
-        if (!organization_id || !name || !name.trim()) {
+        const { organization_id, project_title, name, group_name, description } = req.body;
+        const finalGroupName = (name || group_name || '').trim();
+        const finalProjectTitle = (project_title || '').trim();
+
+        if (!organization_id || !finalProjectTitle || !finalGroupName) {
             return res.status(400).json({
                 success: false,
-                message: "Organization ID and group name are required"
+                message: "Organization ID, project title, and group name are required"
             });
         }
 
@@ -149,14 +152,36 @@ export const createGroup = async (req, res) => {
                 message: "You must join the organization"
             });
         }
+
+        // check if student has already created a group in this organization
+        const { data: existingGroup, error: existingGroupError } = await supabase
+            .from('student_groups')
+            .select('id')
+            .eq('organization_id', organization_id)
+            .eq('created_by', student_id)
+            .maybeSingle();
+
+        if (existingGroupError) {
+            return res.status(400).json({
+                success: false,
+                message: existingGroupError.message
+            });
+        }
+        if (existingGroup) {
+            return res.status(400).json({
+                success: false,
+                message: "You have already created a project in this organization"
+            });
+        }
  
         const { data: group, error: groupError } = await supabase
             .from('student_groups')
             .insert([{
                 organization_id: organization_id,
-                name: name.trim(),
-                created_by: student_id,
-                max_members: max_members || null
+                name: finalGroupName,
+                project_title: finalProjectTitle,
+                description: description ? description.trim() : null,
+                created_by: student_id
             }])
             .select().single();
         if (groupError) {
@@ -166,6 +191,7 @@ export const createGroup = async (req, res) => {
             });
         }
  
+        // add leader to group_members table
         const { error: memberError } = await supabase
             .from('group_members').insert([{
                 group_id: group.id,
@@ -179,12 +205,98 @@ export const createGroup = async (req, res) => {
         }
         return res.status(201).json({
             success: true,
-            message: "group created successfully",
-            group
+            message: "Project created successfully",
+            group,
+            isLeader: true,
+            members: [{
+                id: student_id,
+                name: req.user.user_metadata?.name || 'Student',
+                rollno: req.user.user_metadata?.rollno || '',
+                isLeader: true
+            }]
         });
 
     } catch (error) {
         console.error("create group error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "internal server error"
+        });
+    }
+};
+
+export const getMyProject = async (req, res) => {
+    try {
+        const student_id = req.user.id;
+        const { organizationId } = req.params;
+
+        if (!organizationId) {
+            return res.status(400).json({
+                success: false,
+                message: "Organization ID is required"
+            });
+        }
+
+        const { data: group, error: groupError } = await supabase
+            .from('student_groups')
+            .select('*')
+            .eq('organization_id', organizationId)
+            .eq('created_by', student_id)
+            .maybeSingle();
+
+        if (groupError) {
+            return res.status(400).json({
+                success: false,
+                message: groupError.message
+            });
+        }
+
+        if (group) {
+            const { data: memberRows } = await supabase
+                .from('group_members')
+                .select('student_id')
+                .eq('group_id', group.id);
+
+            let members = [];
+            if (memberRows && memberRows.length > 0) {
+                const studentIds = memberRows.map(m => m.student_id);
+                const { data: profiles } = await supabase
+                    .from('student_profiles')
+                    .select('id, name, rollno')
+                    .in('id', studentIds);
+
+                members = (profiles || []).map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    rollno: p.rollno,
+                    isLeader: p.id === group.created_by
+                }));
+            } else {
+                members = [{
+                    id: student_id,
+                    name: req.user.user_metadata?.name || 'Student',
+                    rollno: req.user.user_metadata?.rollno || '',
+                    isLeader: true
+                }];
+            }
+
+            return res.status(200).json({
+                success: true,
+                hasProject: true,
+                project: group,
+                isLeader: true,
+                members
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            hasProject: false,
+            project: null
+        });
+
+    } catch (error) {
+        console.error("get my project error:", error);
         return res.status(500).json({
             success: false,
             message: "internal server error"

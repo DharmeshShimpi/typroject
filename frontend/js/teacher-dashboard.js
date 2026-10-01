@@ -30,7 +30,7 @@ async function loadOrganizations() {
                 <div class="spinner-border spinner-border-sm text-primary me-2"></div>
                 Loading organizations...
             </div>
-        `;
+        `; // organizations cards will overwrite this loading spinners as soon as cards get loaded. Because .innerHTML = ... is an assignment, it replaces whatever was previously inside <div id="orgContainer">.
     }
 
     try {
