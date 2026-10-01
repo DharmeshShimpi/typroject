@@ -1,12 +1,11 @@
 import { supabase } from '../supabaseClient.js';
 
-//1. join organization using join code
 export const joinOrganization = async (req, res) => {
     try {
-        const studentId = req.user.id;//login id from auth middleware
-        const { orgCode } = req.body;//code by student
-        const normalizedOrgCode = String(orgCode).trim();//clean input
-        if (!orgCode) {//validate for code not entered
+        const studentId = req.user.id;
+        const { orgCode } = req.body;
+        const normalizedOrgCode = String(orgCode)
+        if (!orgCode) {
             return res.status(400).json({
                 success: false,
                 message: "Organization code is required"
@@ -19,7 +18,7 @@ export const joinOrganization = async (req, res) => {
                 message: "Only students can join organizations"
             });
         }
-        //look organization by join_code
+
         const { data: organization, error: orgError } = await supabase
             .from('organizations')
             .select('*')
@@ -38,7 +37,7 @@ export const joinOrganization = async (req, res) => {
                 message: "Organization not found"
             });
         }
-        //check whether student is already in organization
+
         const { data: existingMembership, error: memberCheckError } = await supabase
             .from('organization_members')
             .select('id')
@@ -57,23 +56,7 @@ export const joinOrganization = async (req, res) => {
                 message: "You are already a member of this organization"
             });
         }
-        //check max member limit
-        const { count, error: countError } = await supabase
-            .from('organization_members')
-            .select('id', { count: 'exact', head: true })
-            .eq('organization_id', organization.id);
-        if (countError) {
-            return res.status(400).json({
-                success: false,
-                message: countError.message
-            });
-        }
-        if (count >= organization.max_members) {
-            return res.status(400).json({
-                success: false,
-                message: "Organization has reached its maximum member limit"
-            });
-        }
+
         //insert student into organization member table
         const { data: membership, error: insertError } = await supabase
             .from('organization_members')
@@ -89,7 +72,7 @@ export const joinOrganization = async (req, res) => {
                 message: insertError.message
             });
         }
-        //return success res
+
         return res.status(200).json({
             success: true,
             message: "Successfully joined the organization",
@@ -104,7 +87,7 @@ export const joinOrganization = async (req, res) => {
         });
     }
 };
-//2. show all organization joined by currrent student
+
 export const getMyOrganizations = async (req, res) => {
     try {
         const { data: memberships, error } = await supabase
@@ -117,7 +100,7 @@ export const getMyOrganizations = async (req, res) => {
                 message: error.message
             });
         }
-        //convert result into clean array
+
         const organizations = memberships.map((membership) => ({
             ...membership.organizations,
             joined_at: membership.joined_at
@@ -136,17 +119,18 @@ export const getMyOrganizations = async (req, res) => {
 
     }
 };
+
 export const createGroup = async (req, res) => {
     try {
         const student_id = req.user.id;
         const { organization_id, name, max_members } = req.body;
-        if (!organization_id || !name || !name.trim()) {//validate fields
+        if (!organization_id || !name || !name.trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Organization ID and group name are required"
             });
         }
-        //chck student is member of this organization
+
         const { data: membership, error: membershipError } = await supabase
             .from('organization_members')
             .select('id')
@@ -165,7 +149,7 @@ export const createGroup = async (req, res) => {
                 message: "You must join the organization"
             });
         }
-        //create group in organization
+ 
         const { data: group, error: groupError } = await supabase
             .from('student_groups')
             .insert([{
@@ -181,7 +165,7 @@ export const createGroup = async (req, res) => {
                 message: groupError.message
             });
         }
-        //add creator as first member of group
+ 
         const { error: memberError } = await supabase
             .from('group_members').insert([{
                 group_id: group.id,
@@ -207,19 +191,19 @@ export const createGroup = async (req, res) => {
         });
     }
 };
-//show full details of one organization for student
+
 export const getOrganizationDetails = async (req, res) => {
 
     try {
         const studentId = req.user.id;
         const { organizationId } = req.params;
-        if (!organizationId) {//validate organizaion id exists
+        if (!organizationId) {
             return res.status(400).json({
                 success: false,
                 message: "Organization id is required"
             });
         }
-        //check loggin user student is member of this organization
+  
         const { data: membership, error: membershipError } = await supabase
             .from('organization_members')
             .select('id')
@@ -232,14 +216,14 @@ export const getOrganizationDetails = async (req, res) => {
                 message: membershipError.message
             });
         }
-        //if student not member of organization
+   
         if (!membership) {
             return res.status(403).json({
                 success: false,
                 message: "you are not member of this organization"
             });
         }
-        //fetch organization details
+   
         const { data: organization, error: orgError } = await supabase
             .from('organizations')
             .select('*')
@@ -251,14 +235,14 @@ export const getOrganizationDetails = async (req, res) => {
                 message: orgError.message
             });
         }
-        //fetch alll member in this organiztion
+    
         const { data: members, error: memberError } = await supabase
             .from('organization_members')
             .select('student_id,joined_at')
             .eq('organization_id', organizationId);
         if (memberError) {
             return res.status(404).json({
-                seccess: false,
+                success: false,
                 message: memberError.message
             });
         }

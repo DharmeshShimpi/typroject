@@ -51,10 +51,21 @@
             </div>
         </section>
 
-        <section id="organizationSection" class="mt-3">
-            <div class="card shadow-sm border rounded-3 p-4">
-                <h4 class="mb-2">Your Organization</h4>
-                <p class="text-muted mb-0">Details will appear here after joining an organization.</p>
+        <!-- org section -->
+        <section class="mt-4">
+            <h4 class="fw-bold mb-3">Your Organizations</h4>
+
+            <!-- empty state -->
+            <div id="emptyState" class="card shadow-sm border rounded-3 p-4 text-muted bg-light">
+                <p class="mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    You haven't joined any organization yet. Enter the 4-digit code above to join your batch.
+                </p>
+            </div>
+
+            <!-- cards dynamically renders here -->
+            <div id="orgContainer" class="row g-3">
+                <!-- IMP area -->
             </div>
         </section>
     </main>
