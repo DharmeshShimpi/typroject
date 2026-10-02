@@ -110,3 +110,121 @@ export const getMyOrganizations = async (req, res) => {
     }
 };
 
+export const getTeacherOrganizationOverview=async(req,res)=>{
+    try{
+        if(req.user.user_metadata?.role !=='teacher'){
+            return res.status(403).json({
+                success:false,
+                message:'only teachers can view this organization'
+            });
+
+        }
+        const {organizationId}=req.params;
+        const {data:organization,error: organizationError}=await supabase
+        .from('organizations')
+        .select('*')
+        .eq('id',organizationId)
+        .eq('teacher_id',req.user.id)
+        .maybeSingle();
+        if(organizationError){
+            return res.status(400).json({
+                success:false,
+                message:organizationError.message
+            });
+        }
+        if(!organization){
+            return res.status(404).json({
+                success:false,
+                message:'organization not found'
+            });
+        }
+        const {data:memberships,error:membershipError}= await supabase
+        .from('organization_members')
+        .select('student_id,joined_at')
+        .eq('organization_id',organizationId);
+        if(membershipError){
+            return res.status(400).json({
+                success:false,
+                message:membershipError.message
+            });
+        }
+        const {data:groupRows,error:groupError}=await supabase
+        .from('student_groups')
+        .select('id, name, created_by, created_at, group_members(student_id, joined_at)')
+        .eq('organization_id', organizationId);
+        if(groupError){
+            return res.status(400).json({
+                success:false,
+                message:groupError.message
+            });
+        }
+        const studentIds=memberships.map((membership) => membership.student_id);
+        let profiles=[];
+        if(studentIds.length>0){
+            const {data,error:profileError}=await supabase.from('student_profiles')
+            .select('id,name,rollno')
+            .in('id',studentIds);
+            if(profileError){
+                return res.status(400).json({
+                    success:false,
+                    message:profileError.message
+                });
+            }
+            profiles=data;
+        }
+          const profileById = new Map(profiles.map((profile) => [profile.id, profile]));
+
+        const students = memberships.map((membership) => {
+            const profile = profileById.get(membership.student_id);
+
+            return {
+                id: membership.student_id,
+                name: profile?.name || 'Student',
+                rollno: profile?.rollno || '',
+                joinedAt: membership.joined_at
+            };
+        });
+
+        const groups = groupRows.map((group) => ({
+            id: group.id,
+            name: group.name,
+            createdBy: group.created_by,
+            createdAt: group.created_at,
+            members: (group.group_members || []).map((member) => {
+                const profile = profileById.get(member.student_id);
+
+                return {
+                    id: member.student_id,
+                    name: profile?.name || 'Student',
+                    rollno: profile?.rollno || ''
+                };
+            })
+        }));
+
+        const groupedStudentIds = new Set(
+            groups.flatMap((group) => group.members.map((member) => member.id))
+        );
+
+        return res.status(200).json({
+            success: true,
+            organization,
+            stats: {
+                studentCount: students.length,
+                groupCount: groups.length,
+                studentsWithoutGroup: students.filter(
+                    (student) => !groupedStudentIds.has(student.id)
+                ).length
+            },
+            students,
+            groups
+        });
+
+    }
+    catch(error){
+        console.error('Teacher orgamization overview error',error);
+        return res.status(500).json({
+            success:false,
+            message:'internal server error'
+        });
+    }
+};
